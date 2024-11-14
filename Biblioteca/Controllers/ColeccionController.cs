@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ClosedXML.Excel;
+using BibliotecaAPIWeb.Models;
 
 namespace Biblioteca.Controllers
 {
@@ -79,5 +81,43 @@ namespace Biblioteca.Controllers
                 return View();
             }
         }
+
+     //Excel base de datos
+
+    public class MyExcelClass
+        {
+            public string filePath = "BibliotecaBaseDatos.xlsx";
+
+            public List<MyExcelClass> ObtenerDatos(string filePath)
+            {
+                var dataList = new List<MyExcelClass>();
+
+                using (var workbook = new XLWorkbook(filePath))
+                {
+
+                }
+            }
+
+            public void InsertarDatos(string filePath, List<MyExcelClass> nuevosDatos)
+            {
+                using (var workbook = new XLWorkbook(filePath))
+                {
+                    var worksheet = workbook.Worksheet(1);
+
+                    int lastRowUsed = worksheet.LastRowUsed().RowNumber();
+
+                    foreach (var item in nuevosDatos)
+                    {
+                        lastRowUsed++;
+
+                        worksheet.Cell(lastRowUsed, 1).Value = item.Id;
+                        worksheet.Cell(lastRowUsed, 2).Value = item.Nombre;
+                        worksheet.Cell(lastRowUsed, 3).Value = item.Prestados;
+                    }
+                    workbook.Save();
+                }
+            }
+        }
+
     }
 }
