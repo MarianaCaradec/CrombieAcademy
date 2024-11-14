@@ -94,8 +94,22 @@ namespace Biblioteca.Controllers
 
                 using (var workbook = new XLWorkbook(filePath))
                 {
+                    var worksheet = workbook.Worksheet(1);
 
+                    var lastRowUsed = worksheet.LastRowUsed().RowNumber();
+
+                    for(int row = 2; row < lastRowUsed; row++)
+                    {
+                        var dataItem = new MyExcelClass
+                        {
+                            Id = worksheet.Cell(row, 1).GetValue<string>(),
+                            Nombre = worksheet.Cell(row, 2).GetValue<string>(),
+                            Prestados = worksheet.Cell(row, 3).GetValue<List<Libro>>()
+                        };
+                        dataList.Add(dataItem);
+                    }
                 }
+                return dataList;
             }
 
             public void InsertarDatos(string filePath, List<MyExcelClass> nuevosDatos)
