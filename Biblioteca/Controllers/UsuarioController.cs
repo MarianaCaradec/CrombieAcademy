@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BibliotecaAPIWeb.Models;
+using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Biblioteca.Controllers
@@ -77,6 +79,57 @@ namespace Biblioteca.Controllers
             catch
             {
                 return View();
+            }
+        }
+
+        //Excel base de datos
+
+        public class MyExcelClass
+        {
+            public string filePath = "BibliotecaBaseDatos.xlsx";
+
+            public List<MyExcelClass> ObtenerDatos(string filePath)
+            {
+                var dataList = new List<MyExcelClass>();
+
+                using (var workbook = new XLWorkbook(filePath))
+                {
+                    var worksheet = workbook.Worksheet(1);
+
+                    var lastRowUsed = worksheet.LastRowUsed().RowNumber();
+
+                    for (int row = 2; row < lastRowUsed; row++)
+                    {
+                        var dataItem = new MyExcelClass
+                        {
+                            Id = worksheet.Cell(row, 1).GetValue<string>(),
+                            Nombre = worksheet.Cell(row, 2).GetValue<string>(),
+                            Prestados = worksheet.Cell(row, 3).GetValue<List<Libro>>()
+                        };
+                        dataList.Add(dataItem);
+                    }
+                }
+                return dataList;
+            }
+
+            public void InsertarDatos(string filePath, List<MyExcelClass> nuevosDatos)
+            {
+                using (var workbook = new XLWorkbook(filePath))
+                {
+                    var worksheet = workbook.Worksheet(1);
+
+                    int lastRowUsed = worksheet.LastRowUsed().RowNumber();
+
+                    foreach (var item in nuevosDatos)
+                    {
+                        lastRowUsed++;
+
+                        worksheet.Cell(lastRowUsed, 1).Value = item.Id;
+                        worksheet.Cell(lastRowUsed, 2).Value = item.Nombre;
+                        worksheet.Cell(lastRowUsed, 3).Value = item.Prestados;
+                    }
+                    workbook.Save();
+                }
             }
         }
     }

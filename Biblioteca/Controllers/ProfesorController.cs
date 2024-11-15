@@ -1,31 +1,29 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ClosedXML.Excel;
-using BibliotecaAPIWeb.Models;
 
-namespace Biblioteca.Controllers
+namespace BibliotecaAPIWeb.Controllers
 {
-    public class ColeccionController : Controller
+    public class ProfesorController : Controller
     {
-        // GET: BibliotecaController
+        // GET: ProfesorController
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET: BibliotecaController/Details/5
+        // GET: ProfesorController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: BibliotecaController/Create
+        // GET: ProfesorController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: BibliotecaController/Create
+        // POST: ProfesorController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -40,13 +38,13 @@ namespace Biblioteca.Controllers
             }
         }
 
-        // GET: BibliotecaController/Edit/5
+        // GET: ProfesorController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: BibliotecaController/Edit/5
+        // POST: ProfesorController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -61,13 +59,13 @@ namespace Biblioteca.Controllers
             }
         }
 
-        // GET: BibliotecaController/Delete/5
+        // GET: ProfesorController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: BibliotecaController/Delete/5
+        // POST: ProfesorController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
@@ -81,6 +79,5 @@ namespace Biblioteca.Controllers
                 return View();
             }
         }
-
     }
 }
