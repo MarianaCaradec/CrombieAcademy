@@ -1,28 +1,54 @@
 ﻿using BibliotecaAPIWeb.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace BibliotecaAPIWeb.Services
 {
-    public class UsuarioService : Usuario
+    public class UsuarioService
     {
-        public UsuarioService(string id, string nombre, List<Libro> prestados)
+        private readonly List<Usuario> _usuarios = new List<Usuario>();
+
+        public Usuario Crear(Usuario usuario)
         {
-            Id = id;
-            Nombre = nombre;
-            Prestados = prestados;
+            usuario.Id = _usuarios.Count > 0 ? _usuarios.Max(u => u.Id) + 1 : 1;
+            _usuarios.Add(usuario);
+            return usuario;
         }
 
-        public void PedirPrestadoLibro(LibroService libro)
+        public List<Usuario> ObtenerTodos()
         {
-            Prestados.Add(libro);
-            FechaPrestamo = DateTime.Now;
-            libro.CambiarDisponibilidad(false);
+            return _usuarios;
         }
 
-        public void DevolverLibroPrestado(LibroService libro)
+        public Usuario ObtenerUsuario(int id)
         {
-            Prestados.Remove(libro);
-            libro.CambiarDisponibilidad(true);
+            return _usuarios.FirstOrDefault(u => u.Id == id);
+        }
+
+        public bool Actualizar(int id, Usuario usuarioActualizado)
+        {
+            var usuario = _usuarios.FirstOrDefault(u => u.Id == id);
+            if(usuario == null)
+            {
+                return false;
+            }
+
+            usuario.Nombre = usuarioActualizado.Nombre;
+            usuario.Prestados = usuarioActualizado.Prestados;
+            return true;
+        }
+
+        public bool Borrar(int id)
+        {
+            var usuarioBorrado = _usuarios.FirstOrDefault(u => u.Id == id);
+
+            if(usuarioBorrado == null)
+            {
+                return false;
+            } 
+
+            _usuarios.Remove(usuarioBorrado);
+            return true;
         }
     }
 }

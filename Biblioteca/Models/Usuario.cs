@@ -2,19 +2,24 @@
 
 namespace BibliotecaAPIWeb.Models
 {
-    public class Usuario
+    public abstract class Usuario
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Nombre { get; set; }
 
         public List<Libro> Prestados { get; set; }
 
-        public DateTime FechaPrestamo { get; set; }
+        public abstract int MaxLibrosPermitidos { get; }
 
-        public DateTime FechaDevolucion { get; set; }
+        public abstract int DiasPrestamo { get; }
 
-        public bool PuedePedirPrestamo { get; set; } = true;
+        public Usuario(int id, string nombre, List<Libro> prestados)
+        {
+            Id = id;
+            Nombre = nombre;
+            Prestados = prestados;
+        }
 
     }
 }

@@ -1,43 +1,84 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BibliotecaAPIWeb.Models;
+using BibliotecaAPIWeb.Services;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace Biblioteca.Controllers
+namespace BibliotecaAPIWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class LibroController : ControllerBase
     {
-        // GET: api/<LibreriaController>
+        private readonly LibroService _libroService;
+
+        public LibroController(LibroService libroService)
+        {
+            _libroService = libroService;
+        }
+
+        // GET: api/<LibroController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public List<Libro> GetAllLibros()
         {
-            return new string[] { "value1", "value2" };
+            var respuesta = _libroService._libros.ToList();
+            return respuesta;
         }
 
-        // GET api/<LibreriaController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET api/<LibroController>/5
+        [HttpGet("{isbn}")]
+        public Libro Get(int isbn)
         {
-            return "value";
+            var respuesta = _libroService._libros[isbn];
+            return respuesta;
+            
         }
 
-        // POST api/<LibreriaController>
+        // POST api/<LibroController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public Libro Post([FromBody] Libro nuevoLibro)
         {
+            _libroService.Crear(nuevoLibro);
+            return nuevoLibro;
+
         }
 
-        // PUT api/<LibreriaController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // PUT api/<LibroController>/5
+        [HttpPut("{titulo}")]
+        public Libro PrestarLibro(string titulo, Usuario usuario)
         {
+            var libroPrestado = _libroService.ObtenerTitulo(titulo);
+
+            _libroService.PrestarLibro(libroPrestado, usuario);
+            return libroPrestado;
         }
 
-        // DELETE api/<LibreriaController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // PUT api/<LibroController>/5
+        [HttpPut("{titulo}")]
+        public Libro DevolverLibro(string titulo, Usuario usuario)
         {
+            var libroDevuelto = _libroService.ObtenerTitulo(titulo);
+
+            _libroService.PrestarLibro(libroDevuelto, usuario);
+            return libroDevuelto;
+        }
+
+        // PUT api/<LibroController>/5
+        [HttpPut("{titulo, isbn}")]
+        public Libro Update(int isbn, Usuario usuario)
+        {
+            var libroActualizado = _libroService.ObtenerISBN(isbn);
+
+            _libroService.Actualizar(libroActualizado, isbn);
+            return libroActualizado;
+        }
+
+        // DELETE api/<LibroController>/5
+        [HttpDelete("{isbn}")]
+        public void Delete(int isbn)
+        {
+            _libroService.Eliminar(isbn);
+            return;
         }
     }
 }

@@ -2,44 +2,51 @@
 
 namespace BibliotecaAPIWeb.Services
 {
-    public class EstudianteService : UsuarioService
+    public class EstudianteService 
     {
-        public EstudianteService(string id, string nombre, List<Libro> prestados) : base(id, nombre, prestados)
+        private readonly List<Estudiante> _estudiantes = new List<Estudiante>();
+
+        public Estudiante Crear(Estudiante estudiante)
         {
-            FechaPrestamo = DateTime.Now;
-            FechaDevolucion = FechaPrestamo.AddDays(7);
+            estudiante.Id = _estudiantes.Count > 0 ? _estudiantes.Max(e => e.Id) + 1 : 1;
+            _estudiantes.Add(estudiante);
+            return estudiante;
         }
 
-        public void PedirPrestadoLibro(LibroService libro)
+        public List<Estudiante> ObtenerTodos()
         {
-            if (PuedePedirPrestamo && Prestados.Count < 3)
-            {
-                base.PedirPrestadoLibro(libro);
-                Console.WriteLine($"LIBRO ADQUIRIDO CON ÉXITO: TENÉS {Prestados.Count} LIBROS");
-            }
-            else
-            {
-                PuedePedirPrestamo = false;
-                Console.WriteLine("NO ES POSIBLE REALIZAR MÁS PRÉSTAMOS: DEVUELVA ALGÚN LIBRO ANTES");
-            }
-
+            return _estudiantes;
         }
 
-        public void DevolverLibroPrestado(LibroService libro)
+        public Estudiante ObtenerId(int id)
         {
-            base.DevolverLibroPrestado(libro);
+            return _estudiantes.FirstOrDefault(e => e.Id == id);
+        }
 
-            if (DateTime.Now <= FechaDevolucion)
+        public bool Actualizar(Estudiante estudianteActualizado, int id)
+        {
+            var estudiante = _estudiantes.FirstOrDefault(e => e.Id == id);
+            if(estudiante == null)
             {
-                PuedePedirPrestamo = true;
-                Console.WriteLine($"LIBRO DEVUELTO CON ÉXITO: TENÉS {Prestados.Count} LIBROS");
+                return false;
             }
-            else
+
+            estudiante.Id = estudianteActualizado.Id;
+            estudiante.Nombre = estudianteActualizado.Nombre;
+            estudiante.Prestados = estudianteActualizado.Prestados;
+            return true;
+        }
+
+        public bool Eliminar(int id)
+        {
+            var estudianteEliminado = _estudiantes.FirstOrDefault(e => e.Id == id);
+            if(estudianteEliminado == null)
             {
-                PuedePedirPrestamo = false;
-                FechaPrestamo = DateTime.Now.AddDays(7);
-                Console.WriteLine("HA EXPIRADO EL PLAZO DE DEVOLUCIÓN DE TU LIBRO: NO PODRÁS RETIRAR LIBROS PRESTADOS POR UNA SEMANA");
+                return false;
             }
+
+            _estudiantes.Remove(estudianteEliminado);
+            return true;
         }
     }
 }
