@@ -1,17 +1,12 @@
 ﻿namespace BibliotecaAPIWeb.Models
 {
-    public class Profesor : Usuario
+    public class Profesor : User
     {
+        public override string UserType { get; set; } = "Profesor";
 
-        public override int MaxLibrosPermitidos => 5;
+        public override int MaxBooksAllowed => 5;
 
-        public override int DiasPrestamo => 14;
+        public override int LoanDays => 14;
 
-        public Profesor(int id, string nombre, List<Libro> prestados) : base(id, nombre, prestados)
-        {
-            Id = id;
-            Nombre = nombre;
-            Prestados = prestados;
-        }
     }
 }
