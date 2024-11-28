@@ -1,6 +1,7 @@
 ﻿using BibliotecaAPIWeb.Data;
 using BibliotecaAPIWeb.InterfacesServices;
 using BibliotecaAPIWeb.Models;
+using Microsoft.AspNetCore.Mvc;
 using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BibliotecaAPIWeb.Services
@@ -10,12 +11,12 @@ namespace BibliotecaAPIWeb.Services
 
         private readonly ExcelRepository _excelRepository;
 
-        public BookService(ExcelRepository excelRepository) 
+        public BookService() 
         {
-            _excelRepository = excelRepository;
+            _excelRepository = new ExcelRepository();
         }
 
-        public void AddBook(Book book)
+        public void AddBook(BookDto book)
         {
             if (book == null) 
             {
@@ -32,17 +33,17 @@ namespace BibliotecaAPIWeb.Services
             }
         }
 
-        public List<Book> GetAll()
+        public List<BookDto> GetAll()
         {
             return _excelRepository.GetDataBooks();
         }
 
-        public Book GetBookByISBN(int isbn)
+        public BookDto GetBookByISBN(int isbn)
         {
             return _excelRepository.GetBookByISBN(isbn);
         }
 
-        public Book GetBookByTitle(string title)
+        public BookDto GetBookByTitle(string title)
         {
             return _excelRepository.GetBookByTitle(title);
         }
@@ -59,59 +60,99 @@ namespace BibliotecaAPIWeb.Services
             return book;
         }
 
-        public bool Delete(int isbn)
+        public void Delete(int isbn)
         {
-            var deletedBook = _excelRepository.GetBookByISBN(isbn);
-
-            if (deletedBook == null)
-            {
-                return false;
-            }
-
-            _excelRepository.GetDataBooks().Remove(deletedBook);
-            return true;
+            _excelRepository.DeleteBook(isbn);
         }
 
-        public bool LoanBook(Book book, User user)
+        private User ConvertToUser(UserDto userDto)
         {
-            if (book == null || !book.Available)
+            return new User
             {
-                throw new ArgumentException("The book cannot be null or unavailable.", nameof(book));
+                Id = userDto.Id,
+                Name = userDto.Name,
+                UserType = userDto.UserType,
+                BooksLoaned = userDto.BooksLoaned.Select(bookDto => new BookDto
+                {
+                    ISBN = bookDto.ISBN,
+                    Author = bookDto.Author,
+                    Title = bookDto.Title,
+                    Available = bookDto.Available
+                }).ToList(),
+                MaxBooksAllowed = userDto.MaxBooksAllowed,
+                CanAskALoan = userDto.CanAskALoan,
+                LoanDays = userDto.LoanDays
+            };
+        }
+
+        private Book ConvertToBook(BookDto bookDto)
+        {
+            return new Book
+            {
+                ISBN = bookDto.ISBN,
+                Author = bookDto.Author,
+                Title = bookDto.Title,
+                Available = bookDto.Available,
+                LoanDate = bookDto.LoanDate,
+                ReturnDate = bookDto.ReturnDate
+            };
+        }
+
+
+        public BookDto LoanBook(BookDto bookDto, UserDto userDto)
+        {
+            if (bookDto == null || !bookDto.Available)
+            {
+                throw new ArgumentException("The book cannot be null or unavailable.", nameof(bookDto));
             }
 
-            if (user.BooksLoaned.Count >= user.MaxBooksAllowed)
+            if (userDto.BooksLoaned.Count >= userDto.MaxBooksAllowed)
             {
-                user.CanAskALoan = false;
+                userDto.CanAskALoan = false;
                 throw new Exception("You cannot ask for more loans: please return a book first.");
             }
 
-            user.CanAskALoan = true;
-            user.BooksLoaned.Add(book);
-            book.Available = false;
-            book.ReturnDate = book.LoanDate.AddDays(user.LoanDays);
-            Console.WriteLine($"Book succesfully loaned: you have to return it before {book.ReturnDate:D}");
-            return true;
+            userDto.CanAskALoan = true;
+            userDto.BooksLoaned.Add(bookDto);
+            bookDto.Available = false;
+            bookDto.ReturnDate = bookDto.LoanDate.AddDays(userDto.LoanDays);
+
+            var book = ConvertToBook(bookDto);
+            var user = ConvertToUser(userDto);
+            _excelRepository.UpdateBookDataByISBN(book);
+            _excelRepository.UpdateUserDataById(user);
+
+            Console.WriteLine($"Book succesfully loaned: you have to return it before {bookDto.ReturnDate:D}");
+            return bookDto;
         }
 
-        public bool ReturnBook(Book book, User user)
+        public BookDto ReturnBook(BookDto bookDto, UserDto userDto)
         {
-            if (!user.BooksLoaned.Contains(book))
+            if (!userDto.BooksLoaned.Contains(bookDto))
             {
-                throw new ArgumentException("The book isn't in your loaned books list.", nameof(book));
+                throw new ArgumentException("The book isn't in your loaned books list.", nameof(bookDto));
             }
 
-            user.BooksLoaned.Remove(book);
-            book.Available = true;
-
-            if (DateTime.Now >= book.ReturnDate)
+            if (DateTime.Now >= bookDto.ReturnDate)
             {
-                user.CanAskALoan = false;
-                book.LoanDate = DateTime.Now.AddDays(7);
+                userDto.CanAskALoan = false;
+                bookDto.LoanDate = DateTime.Now.AddDays(7);
                 throw new Exception("Your time for returning the book has expired: you wont be allowed to ask for a loan for one week");
+            } else
+            {
+                userDto.CanAskALoan = true;
+                Console.WriteLine($"Book succesfully returned, you have {userDto.BooksLoaned.Count} books, you can ask for a loan for {userDto.MaxBooksAllowed - userDto.BooksLoaned.Count} more");
             }
-            user.CanAskALoan = true;
-            Console.WriteLine($"Book succesfully returned, you have {user.BooksLoaned.Count} books, you can ask for a loan for {user.MaxBooksAllowed - user.BooksLoaned.Count} more");
-            return true;
+
+            userDto.BooksLoaned.Remove(bookDto);
+            bookDto.Available = true;
+
+            var book = ConvertToBook(bookDto);
+            var user = ConvertToUser(userDto);
+            _excelRepository.UpdateBookDataByISBN(book);
+            _excelRepository.UpdateUserDataById(user);
+
+            return bookDto;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace BibliotecaAPIWeb.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<User> users = _userService.GetAll();
+            List<UserDto> users = _userService.GetAll();
 
             var usersDto = users.Select(user => new UserDto
             {
@@ -41,15 +41,22 @@ namespace BibliotecaAPIWeb.Controllers
 
         // GET: UsuarioController/Details/5
         [HttpGet("{id}")]
-        public User Get(int id)
+        public UserDto GetById(int id)
         {
-            User response = _userService.GetUserById(id);
+            UserDto response = _userService.GetUserById(id);
+            return response;
+        }
+
+        [HttpGet("get/{type}")]
+        public List<UserDto> GetByType(string type)
+        {
+            List<UserDto> response = _userService.GetUserByType(type);
             return response;
         }
 
         // POST: UsuarioController/Create
         [HttpPost]
-        public User Post([FromBody] User newUser)
+        public UserDto Post([FromBody] UserDto newUser)
         {
             _userService.AddUser(newUser);
             return newUser;

@@ -1,4 +1,4 @@
-﻿using System;
+﻿        using System;
 using System.Text.Json.Serialization;
 
 namespace BibliotecaAPIWeb.Models
@@ -36,7 +36,7 @@ namespace BibliotecaAPIWeb.Models
         }
 
         [JsonIgnore]
-        public List<Book> BooksLoaned { get; set; } = new List<Book>();
+        public List<BookDto> BooksLoaned { get; set; } = new List<BookDto>();
 
         [JsonIgnore]
         public virtual int MaxBooksAllowed { get; set; }
@@ -80,7 +80,7 @@ namespace BibliotecaAPIWeb.Models
             }
         }
 
-        public List<Book> BooksLoaned { get; set; }
+        public List<BookDto> BooksLoaned { get; set; }
 
         public virtual int MaxBooksAllowed { get; set; }
 

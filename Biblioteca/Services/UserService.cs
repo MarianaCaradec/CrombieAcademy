@@ -8,12 +8,12 @@ namespace BibliotecaAPIWeb.Services
     {
         private readonly ExcelRepository _excelRepository;
 
-        public UserService(ExcelRepository excelRepository)
+        public UserService()
         {
-            _excelRepository = excelRepository;
+            _excelRepository = new ExcelRepository();
         }
 
-        public void AddUser(User user)
+        public UserDto AddUser(UserDto user)
         {
             if (user == null)
             {
@@ -23,6 +23,7 @@ namespace BibliotecaAPIWeb.Services
             try
             {
                 _excelRepository.CreateUserData(user);
+                return user;
             } catch (Exception ex)
             {
                 throw new InvalidOperationException("Failed to add books to the Excel database.", ex);
@@ -30,21 +31,21 @@ namespace BibliotecaAPIWeb.Services
 
         }
 
-        public List<User> GetAll()
+        public List<UserDto> GetAll()
         {
             return _excelRepository.GetDataUsers();
         }
 
-        public User GetUserByType(string userType)
-        {
-            User user = _excelRepository.GetUserByType(userType);
-
-            return user;            
-        }
-
-        public User GetUserById(int id)
+        public UserDto GetUserById(int id)
         {
             return _excelRepository.GetUserById(id);
+        }
+
+        public List<UserDto> GetUserByType(string userType)
+        {
+            List<UserDto> users = _excelRepository.GetUserByType(userType);
+
+            return users;
         }
 
         public User Update(User user)
@@ -58,17 +59,9 @@ namespace BibliotecaAPIWeb.Services
             return user;
         }
 
-        public bool Delete(int id)
+        public void Delete(int id)
         {
-            var deletedUser = _excelRepository.GetUserById(id);
-
-            if (deletedUser == null)
-            {
-                return false;
-            }
-
-            _excelRepository.GetDataUsers().Remove(deletedUser);
-            return true;
+            _excelRepository.DeleteUser(id);
         }
     }
 }

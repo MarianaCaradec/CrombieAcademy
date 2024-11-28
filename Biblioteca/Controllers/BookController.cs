@@ -23,10 +23,10 @@ namespace BibliotecaAPIWeb.Controllers
         }
 
         // GET: api/<LibroController>
-        [HttpGet]
+        [HttpGet]  
         public IActionResult GetAllLibros()
         {
-            List<Book> books = _bookService.GetAll();
+            List<BookDto> books = _bookService.GetAll();
 
             var booksDto = books.Select(libro => new BookDto
             {
@@ -41,52 +41,21 @@ namespace BibliotecaAPIWeb.Controllers
 
         // GET api/<LibroController>/5
         [HttpGet("{isbn}")]
-        public Book Get(int isbn)
+        public BookDto Get(int isbn)
         {
-            Book response = _bookService.GetBookByISBN(isbn);
+            BookDto response = _bookService.GetBookByISBN(isbn);
             return response;
         }
 
         // POST api/<LibroController>
         [HttpPost]
-        public Book Post([FromBody] Book newBook)
+        public BookDto Post([FromBody] BookDto newBook)
         {
             _bookService.AddBook(newBook);
             return newBook;
 
         }
 
-        // POST api/<LibroController>/5
-        [HttpPost("prestar/{tituloPrestar}")]
-        public IActionResult LoanBook(string title, int userId)
-        {
-            Book loanedBook = _bookService.GetBookByTitle(title);
-            User user = _userService.GetUserById(userId);
-
-            if(loanedBook == null || user == null)
-            {
-                return null;
-            }
-
-            var response = _bookService.LoanBook(loanedBook, user);
-            return Ok(response);
-        }
-
-        // POST api/<LibroController>/5
-        [HttpPost("devolver/{tituloDevolver}")]
-        public IActionResult ReturnBook(string title, int userId)
-        {
-            Book returnedBook = _bookService.GetBookByTitle(title);
-            User user = _userService.GetUserById(userId);
-
-            if (returnedBook == null || user == null)
-            {
-                return null;
-            }
-
-            var response = _bookService.ReturnBook(returnedBook, user);
-            return Ok(response);
-        }
 
         // PUT api/<LibroController>/5
         [HttpPut("{isbnActualizar}")]
@@ -98,7 +67,7 @@ namespace BibliotecaAPIWeb.Controllers
             {
                 return null;
             }
-            
+
             return Ok(updatedBook);
         }
 
@@ -109,5 +78,38 @@ namespace BibliotecaAPIWeb.Controllers
             _bookService.Delete(isbn);
             return;
         }
+
+        // POST api/<LibroController>/5
+        [HttpPost("prestar/{title}")]
+        public IActionResult LoanBook(string title, int userId)
+        {
+            BookDto loanedBook = _bookService.GetBookByTitle(title);
+            UserDto user = _userService.GetUserById(userId);
+
+            if(loanedBook == null || user == null)
+            {
+                return null;
+            }
+
+            var response = _bookService.LoanBook(loanedBook, user);
+            return Ok(response);
+        }
+
+        // POST api/<LibroController>/5
+        [HttpPost("devolver/{title}")]
+        public IActionResult ReturnBook(string title, int userId)
+        {
+            BookDto returnedBook = _bookService.GetBookByTitle(title);
+            UserDto user = _userService.GetUserById(userId);
+
+            if (returnedBook == null || user == null)
+            {
+                return null;
+            }
+
+            var response = _bookService.ReturnBook(returnedBook, user);
+            return Ok(response);
+        }
+
     }
 }
