@@ -57,120 +57,103 @@ namespace BibliotecaAPIWeb.Services
             _dataRepository.DeleteBook(isbn);
         }
 
-    private UserDto ConvertToUserDto(User user)
-    {
-        return new UserDto
+        private UserDto ConvertToUserDto(User user)
         {
-            Id = user.Id,
-            Name = user.Name,
-            UserType = user.UserType,
-            MaxBooksAllowed = user.MaxBooksAllowed,
-            Sales = user.Sales
-            .Where(sale => sale.Book != null)
-            .Select(sale => new Sales
+            return new UserDto
             {
-                ISBNBook = sale.ISBNBook,
-                LoanDate = sale.LoanDate,
-                ReturnDate = sale.ReturnDate,
-                UserId = user.Id,
-                Book = new Book
+                Id = user.Id,
+                Name = user.Name,
+                UserType = user.UserType,
+                MaxBooksAllowed = user.MaxBooksAllowed,
+                Sales = user.Sales
+                .Where(sale => sale.Book != null)
+                .Select(sale => new Sales
                 {
-                    ISBN = sale.Book.ISBN,
-                    Author = sale.Book.Author,
-                    Title = sale.Book.Title,
-                    Available = sale.Book.Available,
-                }
-            }).ToList(),
-            //CanAskALoan = user.CanAskALoan,
-        };
-    }
-
-    private BookDto ConvertToBookDto(Book book)
-    {
-        return new BookDto
-        {
-            ISBN = book.ISBN,
-            Author = book.Author,
-            Title = book.Title,
-            Available = book.Available,
-        };
-    }
-
-
-    public object LoanBook(Book book, User user)
-
-    {
-        if (book == null || !book.Available)
-        {
-            throw new ArgumentException("The book cannot be null or unavailable.", nameof(book));
+                    ISBNBook = sale.ISBNBook,
+                    LoanDate = sale.LoanDate,
+                    ReturnDate = sale.ReturnDate,
+                    UserId = user.Id,
+                    Book = new Book
+                    {
+                        ISBN = sale.Book.ISBN,
+                        Author = sale.Book.Author,
+                        Title = sale.Book.Title,
+                        Available = sale.Book.Available,
+                    }
+                }).ToList(),
+            };
         }
 
-        //user.CanAskALoan = true;
-
-        Sales sales = new Sales
+        private BookDto ConvertToBookDto(Book book)
         {
-            ISBNBook = book.ISBN,
-            UserId = user.Id,
-            LoanDate = DateTime.Now,
-        };
-
-        user.Sales.Add(sales);
-        book.Available = false;
-
-        if (user.UserType == "Profesor")
-        {
-            sales.ReturnDate = sales.LoanDate.AddDays(14);
-        }
-        else
-        {
-            sales.ReturnDate = sales.LoanDate.AddDays(7);
+            return new BookDto
+            {
+                ISBN = book.ISBN,
+                Author = book.Author,
+                Title = book.Title,
+                Available = book.Available,
+            };
         }
 
-        var bookDto = ConvertToBookDto(book);
-        var userDto = ConvertToUserDto(user);
-        _dataRepository.UpdateBookByISBN(bookDto);
-        _dataRepository.UpdateUserById(userDto);
 
-        Console.WriteLine($"Book succesfully loaned: you have to return it before {sales.ReturnDate:D}");
-        return book;
-    }
+        public object LoanBook(Book book, User user)
 
-    public object ReturnBook(Book book, User user)
-    {
-        Sales sales = new Sales
         {
-           ISBNBook = book.ISBN,
-           UserId = user.Id,
-           LoanDate = DateTime.Now,
-        };
+            if (book == null || !book.Available)
+            {
+                throw new ArgumentException("The book cannot be null or unavailable.", nameof(book));
+            }
 
-            if (!user.Sales.Contains(sales))
+            Sales sales = new Sales
+            {
+                ISBNBook = book.ISBN,
+                UserId = user.Id,
+                LoanDate = DateTime.Now,
+                ReturnDate = user.UserType == "Profesor"
+                ? DateTime.Now.AddDays(14)
+                : DateTime.Now.AddDays(7)
+            };
+
+            _dataRepository.InsertSale(sales);
+            book.Available = false;
+            _dataRepository.UpdateBookByISBN(ConvertToBookDto(book));
+
+            user.Sales.Add(sales);
+            _dataRepository.UpdateUserById(ConvertToUserDto(user));
+
+            Console.WriteLine($"Book succesfully loaned: you have to return it before {sales.ReturnDate:D}");
+            return book;
+        }
+
+        public object ReturnBook(Book book, User user)
+        {
+            Sales existingSale = user.Sales.FirstOrDefault(s => s.ISBNBook == book.ISBN && s.UserId == user.Id);
+
+            if (existingSale == null)
             {
                 throw new ArgumentException("The book isn't in your loaned books list.", nameof(book));
             }
 
-            if (DateTime.Now >= sales.ReturnDate)
+            if (DateTime.Now >= existingSale.ReturnDate)
             {
-                //user.CanAskALoan = false;
-                sales.LoanDate = DateTime.Now.AddDays(7);
+                existingSale.LoanDate = DateTime.Now.AddDays(7);
                 throw new Exception("Your time for returning the book has expired: you wont be allowed to ask for a loan for one week");
             }
             else
             {
-                //user.CanAskALoan = true;
                 Console.WriteLine($"Book succesfully returned, you have {user.Sales.Count} books, you can ask for a loan for {user.MaxBooksAllowed - user.Sales.Count} more");
             }
 
-        user.Sales.Remove(sales);
-        book.Available = true;
+            _dataRepository.DeleteSale(existingSale);
+            book.Available = true;
+            _dataRepository.UpdateBookByISBN(ConvertToBookDto(book));
 
-        var bookDto = ConvertToBookDto(book);
-        var userDto = ConvertToUserDto(user);
-        _dataRepository.UpdateBookByISBN(bookDto);
-        _dataRepository.UpdateUserById(userDto);
 
-        return book;
-    }
+            user.Sales.Remove(existingSale);
+            _dataRepository.UpdateUserById(ConvertToUserDto(user));
+
+            return book;
         }
     }
+}
 

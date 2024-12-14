@@ -64,11 +64,11 @@ namespace BibliotecaAPIWeb.Data
                 {
                     var sql = @"
                         SELECT
-                            u.ID AS id_user,
+                            u.ID,
                             u.Name,
                             u.UserType,
                             u.MaxBooksAllowed,
-                            s.ID as sales_id,
+                            s.ID AS sales_id,
                             s.ISBN_book,
                             s.id_user,
                             b.ISBN,
@@ -341,5 +341,37 @@ namespace BibliotecaAPIWeb.Data
                 }
             }
         }
+
+        public void InsertSale(Sales sale)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string query = @"
+                             INSERT INTO Sales (id_user, ISBN_book, LoanDate, ReturnDate)
+                             VALUES (@id_user, @ISBN_book, @LoanDate, @ReturnDate)";
+                connection.Execute(query, new
+                {
+                    ISBN_book = sale.ISBNBook,
+                    id_user = sale.UserId,
+                    LoanDate = sale.LoanDate,
+                    ReturnDate = sale.ReturnDate
+                });
+            }
+        }
+
+        public void DeleteSale(Sales sale)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                string query = "DELETE FROM Sales WHERE UserId = @UserId AND ISBNBook = @ISBNBook";
+                connection.Execute(query, new
+                {
+                    id_user = sale.UserId,
+                    ISBN_book = sale.ISBNBook
+                });
+            }
+        }
+
+
     }
 }

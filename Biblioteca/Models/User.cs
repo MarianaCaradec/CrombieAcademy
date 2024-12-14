@@ -13,7 +13,7 @@ namespace BibliotecaAPIWeb.Models
 
         public virtual int MaxBooksAllowed { get; set; }
 
-        public List<Sales> Sales { get; set; } = new List<Sales>();
+        public List<Sales>? Sales { get; set; } = new List<Sales>();
 
     } 
 }

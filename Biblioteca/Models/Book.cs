@@ -25,5 +25,8 @@ namespace BibliotecaAPIWeb.Models
 
         public bool Available { get; set; }
 
+        [JsonIgnore]
+        public List<Sales>? Sales { get; set; } = new List<Sales>();
+
     }
 }
