@@ -3,22 +3,25 @@ using BibliotecaAPIWeb.InterfacesServices;
 using BibliotecaAPIWeb.Utilities;
 using BibliotecaAPIWeb.Middleware;
 using BibliotecaAPIWeb.Services;
+using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var logFilePath = Path.Combine(
-    AppDomain.CurrentDomain.BaseDirectory,
-    "Logs",
-    "api-errors.log");
+//var logFilePath = Path.Combine(
+//    AppDomain.CurrentDomain.BaseDirectory,
+//    "Logs",
+//    "api-errors.log");
 
-Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
+//Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton(new FileLogger(logFilePath));
+builder.Services.AddSingleton<DapperContext>();
+builder.Services.AddScoped<DataRepository>();
+//builder.Services.AddSingleton(new FileLogger(logFilePath));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBookService, BookService>();
 
@@ -35,7 +38,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseMiddleware<ErrorLoggingMiddleware>();
+//app.UseMiddleware<ErrorLoggingMiddleware>();
 
 app.MapControllers();
 

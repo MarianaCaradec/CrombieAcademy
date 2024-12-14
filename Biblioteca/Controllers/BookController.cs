@@ -22,13 +22,29 @@ namespace BibliotecaAPIWeb.Controllers
             _userService = userService;
         }
 
-        // GET: api/<LibroController>
-        [HttpGet]  
+
+        // Acción que invoca el método Insert()
+        [HttpPost("insert")]
+        public IActionResult InsertBook(Book newBook)
+        {
+            try
+            {
+                _bookService.AddBook(newBook);
+                return Ok("Libro insertado correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al insertar el libro: {ex.Message}");
+            }
+        }
+
+        //GET: api/<LibroController>
+        [HttpGet]
         public IActionResult GetAllLibros()
         {
-            List<BookDto> books = _bookService.GetAll();
+            IEnumerable<Book> books = _bookService.GetAll();
 
-            var booksDto = books.Select(libro => new BookDto
+            var book = books.Select(libro => new Book
             {
                 Author = libro.Author,
                 Title = libro.Title,
@@ -36,20 +52,20 @@ namespace BibliotecaAPIWeb.Controllers
                 Available = libro.Available,
             }).ToList();
 
-            return Ok(booksDto);
+            return Ok(book);
         }
 
         // GET api/<LibroController>/5
         [HttpGet("{isbn}")]
-        public BookDto Get(int isbn)
+        public Book Get(string isbn)
         {
-            BookDto response = _bookService.GetBookByISBN(isbn);
+            Book response = _bookService.GetBookByISBN(isbn);
             return response;
         }
 
-        // POST api/<LibroController>
+        //POST api/<LibroController>
         [HttpPost]
-        public BookDto Post([FromBody] BookDto newBook)
+        public Book Post([FromBody] Book newBook)
         {
             _bookService.AddBook(newBook);
             return newBook;
@@ -59,7 +75,7 @@ namespace BibliotecaAPIWeb.Controllers
 
         // PUT api/<LibroController>/5
         [HttpPut("{isbnActualizar}")]
-        public IActionResult Update([FromBody] Book book)
+        public IActionResult Update([FromBody] BookDto book)
         {
             var updatedBook = _bookService.Update(book);
 
@@ -73,7 +89,7 @@ namespace BibliotecaAPIWeb.Controllers
 
         // DELETE api/<LibroController>/5
         [HttpDelete("{isbnEliminar}")]
-        public void Delete(int isbn)
+        public void Delete(string isbn)
         {
             _bookService.Delete(isbn);
             return;
@@ -83,10 +99,10 @@ namespace BibliotecaAPIWeb.Controllers
         [HttpPost("prestar/{title}")]
         public IActionResult LoanBook(string title, int userId)
         {
-            BookDto loanedBook = _bookService.GetBookByTitle(title);
-            UserDto user = _userService.GetUserById(userId);
+            Book loanedBook = _bookService.GetBookByTitle(title);
+            User user = _userService.GetUserById(userId);
 
-            if(loanedBook == null || user == null)
+            if (loanedBook == null || user == null)
             {
                 return null;
             }
@@ -99,8 +115,8 @@ namespace BibliotecaAPIWeb.Controllers
         [HttpPost("devolver/{title}")]
         public IActionResult ReturnBook(string title, int userId)
         {
-            BookDto returnedBook = _bookService.GetBookByTitle(title);
-            UserDto user = _userService.GetUserById(userId);
+            Book returnedBook = _bookService.GetBookByTitle(title);
+            User user = _userService.GetUserById(userId);
 
             if (returnedBook == null || user == null)
             {

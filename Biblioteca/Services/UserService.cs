@@ -6,11 +6,11 @@ namespace BibliotecaAPIWeb.Services
 {
     public class UserService : IUserService
     {
-        private readonly ExcelRepository _excelRepository;
+        private readonly DataRepository _dataRepository;
 
-        public UserService()
+        public UserService(DataRepository dataRepository)
         {
-            _excelRepository = new ExcelRepository();
+            _dataRepository = dataRepository;
         }
 
         public UserDto AddUser(UserDto user)
@@ -22,46 +22,46 @@ namespace BibliotecaAPIWeb.Services
 
             try
             {
-                _excelRepository.CreateUserData(user);
+                _dataRepository.CreateUser(user);
                 return user;
             } catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to add books to the Excel database.", ex);
+                throw new InvalidOperationException("Failed to add users to the database.", ex);
             }
 
         }
 
-        public List<UserDto> GetAll()
+        public IEnumerable<User> GetAll()
         {
-            return _excelRepository.GetDataUsers();
+            return _dataRepository.GetUsers();
         }
 
-        public UserDto GetUserById(int id)
+        public User GetUserById(int id)
         {
-            return _excelRepository.GetUserById(id);
+            return _dataRepository.GetUserById(id);
         }
 
-        public List<UserDto> GetUserByType(string userType)
+        public List<User> GetUserByType(string userType)
         {
-            List<UserDto> users = _excelRepository.GetUserByType(userType);
+            List<User> users = _dataRepository.GetUserByType(userType);
 
             return users;
         }
 
-        public User Update(User user)
+        public UserDto Update(UserDto user)
         {
             if (user == null)
             {
                 return null;
             }
 
-            _excelRepository.UpdateUserDataById(user);
+            _dataRepository.UpdateUserById(user);
             return user;
         }
 
         public void Delete(int id)
         {
-            _excelRepository.DeleteUser(id);
+            _dataRepository.DeleteUser(id);
         }
     }
 }

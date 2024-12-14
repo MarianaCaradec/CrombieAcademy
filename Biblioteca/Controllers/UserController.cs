@@ -23,34 +23,32 @@ namespace BibliotecaAPIWeb.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<UserDto> users = _userService.GetAll();
+            IEnumerable<User> users = _userService.GetAll();
 
-            var usersDto = users.Select(user => new UserDto
+            var user = users.Select(user => new User
             {
                 Id = user.Id,
                 Name = user.Name,
                 UserType = user.UserType,
-                BooksLoaned = user.BooksLoaned,
                 MaxBooksAllowed = user.MaxBooksAllowed,
-                CanAskALoan = user.CanAskALoan,
-                LoanDays = user.LoanDays,
+                //CanAskALoan = user.CanAskALoan,
             }).ToList();
 
-            return Ok(usersDto);
+            return Ok(user);
         }
 
-        // GET: UsuarioController/Details/5
+        //GET: UsuarioController/Details/5
         [HttpGet("{id}")]
-        public UserDto GetById(int id)
+        public User GetById(int id)
         {
-            UserDto response = _userService.GetUserById(id);
+            User response = _userService.GetUserById(id);
             return response;
         }
 
         [HttpGet("get/{type}")]
-        public List<UserDto> GetByType(string type)
+        public List<User> GetByType(string type)
         {
-            List<UserDto> response = _userService.GetUserByType(type);
+            List<User> response = _userService.GetUserByType(type);
             return response;
         }
 
@@ -64,7 +62,7 @@ namespace BibliotecaAPIWeb.Controllers
 
         // PUT: UsuarioController/Update/5
         [HttpPut("{idActualizar}")]
-        public IActionResult Update([FromBody] User user)
+        public IActionResult Update([FromBody] UserDto user)
         {
             var updatedUser = _userService.Update(user);
 

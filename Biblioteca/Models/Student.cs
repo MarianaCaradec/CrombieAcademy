@@ -8,7 +8,5 @@ namespace BibliotecaAPIWeb.Models
 
         public override int MaxBooksAllowed => 3;
 
-        public override int LoanDays => 7;
-
     }
 }

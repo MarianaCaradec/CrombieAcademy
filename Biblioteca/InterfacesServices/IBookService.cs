@@ -5,13 +5,13 @@ namespace BibliotecaAPIWeb.InterfacesServices
 {
     public interface IBookService
     {
-        Book Update(Book updatedBook);
-        void AddBook(BookDto libro);
-        void Delete(int isbn);
-        BookDto GetBookByISBN(int isbn);
-        BookDto GetBookByTitle(string title);
-        List<BookDto> GetAll();
-        BookDto LoanBook(BookDto book, UserDto user);
-        BookDto ReturnBook(BookDto book, UserDto user);
+        BookDto Update(BookDto updatedBook);
+        void AddBook(Book newBook);
+        void Delete(string isbn);
+        Book GetBookByISBN(string isbn);
+        Book GetBookByTitle(string title);
+        IEnumerable<Book> GetAll();
+        object LoanBook(Book book, User user);
+        object ReturnBook(Book book, User user);
     }
 }

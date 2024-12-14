@@ -8,16 +8,9 @@ namespace BibliotecaAPIWeb.Models
 
         public string Title { get; set; }
 
-        [JsonIgnore]
-        public int ISBN { get; init; }
+        public string ISBN { get; init; }
 
         public bool Available { get; set; }
-
-        [JsonIgnore]
-        public DateTime LoanDate { get; set; } = DateTime.Now;
-
-        [JsonIgnore]
-        public DateTime ReturnDate { get; set; }
 
     }
 
@@ -27,12 +20,10 @@ namespace BibliotecaAPIWeb.Models
 
         public string Title { get; set; }
 
-        public int ISBN { get; init; }
+        [JsonIgnore]
+        public string ISBN { get; init; }
 
         public bool Available { get; set; }
 
-        public DateTime LoanDate { get; set; } = DateTime.Now;
-
-        public DateTime ReturnDate { get; set; }
     }
 }

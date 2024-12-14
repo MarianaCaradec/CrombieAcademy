@@ -6,7 +6,5 @@
 
         public override int MaxBooksAllowed => 5;
 
-        public override int LoanDays => 14;
-
     }
 }

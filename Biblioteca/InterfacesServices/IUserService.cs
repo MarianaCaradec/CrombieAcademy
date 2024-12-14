@@ -4,11 +4,11 @@ namespace BibliotecaAPIWeb.InterfacesServices
 {
     public interface IUserService
     {
-        User Update(User usuarioActualizado);
+        UserDto Update(UserDto usuarioActualizado);
         UserDto AddUser(UserDto usuario);
         void Delete(int id);
-        List<UserDto> GetAll();
-        UserDto GetUserById(int id);
-        List<UserDto> GetUserByType(string type);
+        IEnumerable<User> GetAll();
+        User GetUserById(int id);
+        List<User> GetUserByType(string type);
     }
 }
