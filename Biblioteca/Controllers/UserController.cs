@@ -32,11 +32,12 @@ namespace BibliotecaAPIWeb.Controllers
 
             var mappedUser = users.Select(user => new User
             {
+                Id = user.Id,
                 Name = user.Name,
                 UserType = user.UserType,
                 MaxBooksAllowed = user.MaxBooksAllowed,
                 Sales = user.Sales != null ? user.Sales : new List<Sales>()
-                //Sales = user.Sales != null ?
+                //Sales = user.Sales != null && user.Sales.Any() ?
                 //user.Sales.Select(sale => new SalesDto
                 //{
                 //    LoanDate = sale.LoanDate,

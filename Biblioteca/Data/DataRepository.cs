@@ -68,7 +68,8 @@ namespace BibliotecaAPIWeb.Data
                             u.UserType,
                             u.MaxBooksAllowed,
                             s.ID,
-                            s.ISBN_book,
+                            s.ISBN_book as isbnBook,
+                            s.id_user as UserId,
                             s.loanDate,
                             s.returnDate
                         FROM Users u
@@ -77,6 +78,7 @@ namespace BibliotecaAPIWeb.Data
                     var users = connection.Query<User, Sales, User>(sql,
                     (user, sales) =>
                     {
+                        Console.WriteLine(sales);
                         user.Sales = new List<Sales>();
 
                         if (sales != null && sales.Id != 0)
