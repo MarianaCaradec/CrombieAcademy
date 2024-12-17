@@ -21,7 +21,7 @@ namespace BibliotecaAPIWeb.Models
         public string Title { get; set; }
 
         [JsonIgnore]
-        public string ISBN { get; init; }
+        public string ISBN { get; set; }
 
         public bool Available { get; set; }
 

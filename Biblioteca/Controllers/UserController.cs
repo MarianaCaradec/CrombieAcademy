@@ -25,13 +25,31 @@ namespace BibliotecaAPIWeb.Controllers
         {
             IEnumerable<User> users = _userService.GetAll();
 
+            if(users == null)
+            {
+                return NotFound();
+            }
+
             var mappedUser = users.Select(user => new User
             {
-                Id = user.Id,
                 Name = user.Name,
                 UserType = user.UserType,
                 MaxBooksAllowed = user.MaxBooksAllowed,
                 Sales = user.Sales != null ? user.Sales : new List<Sales>()
+                //Sales = user.Sales != null ?
+                //user.Sales.Select(sale => new SalesDto
+                //{
+                //    LoanDate = sale.LoanDate,
+                //    ReturnDate = sale.ReturnDate,
+                //    Book = sale.Book != null ?
+                //    new BookDto
+                //    {
+                //        Title = sale.Book.Title,
+                //        Author = sale.Book.Author
+                //    }
+                //    : null
+                //}).ToList()
+                //: new List<SalesDto>()
             });
 
             return Ok(mappedUser);

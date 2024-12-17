@@ -69,9 +69,8 @@ namespace BibliotecaAPIWeb.Data
                             u.MaxBooksAllowed,
                             s.ID,
                             s.ISBN_book,
-                            s.id_user,
-                        s.loanDate,
-                        s.returnDate
+                            s.loanDate,
+                            s.returnDate
                         FROM Users u
                         LEFT JOIN Sales s ON u.ID = s.id_user;";
 
@@ -80,7 +79,7 @@ namespace BibliotecaAPIWeb.Data
                     {
                         user.Sales = new List<Sales>();
 
-                        if (sales != null && sales.Id != 9)
+                        if (sales != null && sales.Id != 0)
                         {
                             user.Sales.Add(sales);
                         }
