@@ -25,7 +25,16 @@ namespace BibliotecaAPIWeb.Controllers
         {
             IEnumerable<User> users = _userService.GetAll();
 
-            return Ok(users);
+            var mappedUser = users.Select(user => new User
+            {
+                Id = user.Id,
+                Name = user.Name,
+                UserType = user.UserType,
+                MaxBooksAllowed = user.MaxBooksAllowed,
+                Sales = user.Sales != null ? user.Sales : new List<Sales>()
+            });
+
+            return Ok(mappedUser);
         }
 
         //GET: UsuarioController/Details/5

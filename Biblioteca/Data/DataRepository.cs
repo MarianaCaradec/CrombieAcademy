@@ -67,26 +67,29 @@ namespace BibliotecaAPIWeb.Data
                             u.Name,
                             u.UserType,
                             u.MaxBooksAllowed,
-                            s.ID AS sales_id,
+                            s.ID,
                             s.ISBN_book,
-                            s.id_user
+                            s.id_user,
+                        s.loanDate,
+                        s.returnDate
                         FROM Users u
                         LEFT JOIN Sales s ON u.ID = s.id_user;";
 
                     var users = connection.Query<User, Sales, User>(sql,
-                        (user, sales) =>
+                    (user, sales) =>
+                    {
+                        user.Sales = new List<Sales>();
+
+                        if (sales != null && sales.Id != 9)
                         {
-                            user.Sales = new List<Sales>();
+                            user.Sales.Add(sales);
+                        }
 
-                            if (sales != null)
-                            {
-                                user.Sales.Add(sales);
-                            }
+                        return user;
+                    },
+                    splitOn: "ID"
+                    );
 
-                            return user;
-                        },
-                        splitOn: "sales_id"
-                        );
                     return users;
                 }
                 catch (SqlException sqlEx)
@@ -347,8 +350,8 @@ namespace BibliotecaAPIWeb.Data
                 {
                     ISBN_book = sale.ISBNBook,
                     id_user = sale.UserId,
-                    LoanDate = sale.LoanDate,
-                    ReturnDate = sale.ReturnDate
+                    sale.LoanDate,
+                    sale.ReturnDate
                 });
             }
         }
@@ -357,7 +360,7 @@ namespace BibliotecaAPIWeb.Data
         {
             using (var connection = _context.CreateConnection())
             {
-                string query = "DELETE FROM Sales WHERE UserId = @UserId AND ISBNBook = @ISBNBook";
+                string query = "DELETE FROM Sales WHERE id_user = @id_user AND ISBNBook = @ISBNBook";
                 connection.Execute(query, new
                 {
                     id_user = sale.UserId,
