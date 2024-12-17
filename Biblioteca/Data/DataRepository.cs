@@ -203,32 +203,6 @@ namespace BibliotecaAPIWeb.Data
             }
         }
 
-        public Book GetBookByTitle(string title)
-        {
-            using (var connection = _context.CreateConnection())
-            {
-                try
-                {
-                    var sql = @"
-                        SELECT
-                            b.ISBN,
-                            b.Author,
-                            b.Title,
-                            b.Available
-                        FROM Books b
-                        WHERE b.Title = @Title";
-
-                    var book = connection.QueryFirst<Book>(sql, new { Title = title });
-                    return book;
-                }
-                catch (SqlException sqlEx)
-                {
-                    return null;
-                    throw new Exception("Ocurrió un error al tomar el libro de la base de datos", sqlEx);
-                }
-            }
-        }
-
         public string UpdateUserById(UserDto updatedUser)
         {
             using (var connection = _context.CreateConnection())
@@ -361,7 +335,7 @@ namespace BibliotecaAPIWeb.Data
         {
             using (var connection = _context.CreateConnection())
             {
-                string query = "DELETE FROM Sales WHERE id_user = @id_user AND ISBNBook = @ISBNBook";
+                string query = "DELETE FROM Sales WHERE id_user = @id_user AND ISBN_book = @ISBN_book";
                 connection.Execute(query, new
                 {
                     id_user = sale.UserId,

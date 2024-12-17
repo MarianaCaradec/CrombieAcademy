@@ -9,7 +9,6 @@ namespace BibliotecaAPIWeb.InterfacesServices
         void AddBook(Book newBook);
         void Delete(string isbn);
         Book GetBookByISBN(string isbn);
-        Book GetBookByTitle(string title);
         IEnumerable<Book> GetAll();
         object LoanBook(Book book, User user);
         object ReturnBook(Book book, User user);

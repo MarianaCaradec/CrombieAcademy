@@ -96,10 +96,10 @@ namespace BibliotecaAPIWeb.Controllers
         }
 
         // POST api/<LibroController>/5
-        [HttpPost("prestar/{title}")]
-        public IActionResult LoanBook(string title, int userId)
+        [HttpPost("prestar/{ISBN}")]
+        public IActionResult LoanBook(string ISBN, int userId)
         {
-            Book loanedBook = _bookService.GetBookByTitle(title);
+            Book loanedBook = _bookService.GetBookByISBN(ISBN);
             User user = _userService.GetUserById(userId);
 
             if (loanedBook == null || user == null)
@@ -112,10 +112,10 @@ namespace BibliotecaAPIWeb.Controllers
         }
 
         // POST api/<LibroController>/5
-        [HttpPost("devolver/{title}")]
-        public IActionResult ReturnBook(string title, int userId)
+        [HttpPost("devolver/{ISBN}")]
+        public IActionResult ReturnBook(string ISBN, int userId)
         {
-            Book returnedBook = _bookService.GetBookByTitle(title);
+            Book returnedBook = _bookService.GetBookByISBN(ISBN);
             User user = _userService.GetUserById(userId);
 
             if (returnedBook == null || user == null)

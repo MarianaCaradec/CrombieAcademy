@@ -35,11 +35,6 @@ namespace BibliotecaAPIWeb.Services
             return _dataRepository.GetBookByISBN(isbn);
         }
 
-        public Book GetBookByTitle(string title)
-        {
-            return _dataRepository.GetBookByTitle(title);
-        }
-
         public BookDto Update(BookDto book)
         {
             if (book == null)
@@ -127,6 +122,11 @@ namespace BibliotecaAPIWeb.Services
 
         public object ReturnBook(Book book, User user)
         {
+            if (book == null || user == null)
+            {
+                throw new ArgumentNullException("Book or User is null.");
+            }
+
             Sales existingSale = user.Sales.FirstOrDefault(s => s.ISBNBook == book.ISBN && s.UserId == user.Id);
 
             if (existingSale == null)
