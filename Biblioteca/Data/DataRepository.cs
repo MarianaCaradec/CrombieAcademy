@@ -55,7 +55,6 @@ namespace BibliotecaAPIWeb.Data
             }
         }
 
-
         public IEnumerable<User> GetUsers()
         {
             using (var connection = _context.CreateConnection())
@@ -70,28 +69,23 @@ namespace BibliotecaAPIWeb.Data
                             u.MaxBooksAllowed,
                             s.ID AS sales_id,
                             s.ISBN_book,
-                            s.id_user,
-                            b.ISBN,
-                            b.Author,
-                            b.Title,
-                            b.Available
+                            s.id_user
                         FROM Users u
-                        LEFT JOIN Sales s ON u.ID = s.id_user
-                        LEFT JOIN Books b ON s.ISBN_book = b.ISBN;";
+                        LEFT JOIN Sales s ON u.ID = s.id_user;";
 
                     var users = connection.Query<User, Sales, User>(sql,
                         (user, sales) =>
                         {
                             user.Sales = new List<Sales>();
 
-                            if (sales != null && sales.Id != 0)
+                            if (sales != null)
                             {
                                 user.Sales.Add(sales);
                             }
 
                             return user;
                         },
-                        splitOn: "sales_id, ISBN"
+                        splitOn: "sales_id"
                         );
                     return users;
                 }
@@ -99,7 +93,7 @@ namespace BibliotecaAPIWeb.Data
                 {
                     return Enumerable.Empty<User>();
                 }
-            } 
+            }
         }
 
         public User GetUserById(int id)
