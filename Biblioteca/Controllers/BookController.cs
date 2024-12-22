@@ -116,12 +116,19 @@ namespace BibliotecaAPIWeb.Controllers
         public IActionResult ReturnBook(string ISBN, int userId)
         {
             Book returnedBook = _bookService.GetBookByISBN(ISBN);
-            User user = _userService.GetUserById(userId);
+            User user = _userService.GetUserByIdWithSales(userId);
 
             if (returnedBook == null || user == null)
             {
                 return null;
             }
+
+            Console.WriteLine("User Sales:");
+            foreach (var sale in user.Sales)
+            {
+                Console.WriteLine($"Sale: ISBNBook={sale.ISBNBook}, UserId={sale.UserId}, ReturnDate={sale.ReturnDate}");
+            }
+
 
             var response = _bookService.ReturnBook(returnedBook, user);
             return Ok(response);

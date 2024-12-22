@@ -126,6 +126,30 @@ namespace BibliotecaAPIWeb.Data
             }
         }
 
+        public User GetUserByIdWithSales(int userId)
+        {
+            using (var connection = _context.CreateConnection())
+            {
+                // Obtener usuario
+                var user = connection.Query<User>(
+                    "SELECT * FROM Users WHERE Id = @ID",
+                    new { Id = userId } // Cambiar el nombre del parámetro a "id_user"
+                ).FirstOrDefault();
+
+                if (user != null)
+                {
+                    // Obtener las ventas relacionadas al usuario
+                    user.Sales = connection.Query<Sales>(
+                        "SELECT * FROM Sales WHERE id_user = @id_user",
+                        new { id_user = userId } // Cambiar el nombre del parámetro a "id_user"
+                    ).ToList();
+                }
+
+                return user;
+            }
+        }
+
+
         public List<User> GetUserByType(string userType)
         {
             using (var connection = _context.CreateConnection())

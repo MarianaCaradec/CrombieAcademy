@@ -46,7 +46,7 @@ namespace BibliotecaAPIWeb.Controllers
         [HttpGet("{id}")]
         public User GetById(int id)
         {
-            User response = _userService.GetUserById(id);
+            User response = _userService.GetUserByIdWithSales(id);
             return response;
         }
 

@@ -131,7 +131,7 @@ namespace BibliotecaAPIWeb.Services
 
             if (existingSale == null)
             {
-                throw new ArgumentException("The book isn't in your loaned books list.", nameof(book));
+                throw new ArgumentException("The book isn't in your loaned books list.");
             }
 
             if (DateTime.Now >= existingSale.ReturnDate)

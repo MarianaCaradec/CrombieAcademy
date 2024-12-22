@@ -41,6 +41,11 @@ namespace BibliotecaAPIWeb.Services
             return _dataRepository.GetUserById(id);
         }
 
+        public User GetUserByIdWithSales(int id)
+        {
+            return _dataRepository.GetUserByIdWithSales(id);
+        }
+
         public List<User> GetUserByType(string userType)
         {
             List<User> users = _dataRepository.GetUserByType(userType);
